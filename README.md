@@ -37,3 +37,9 @@ GOOGLE_APPLICATION_CREDENTIALS= YOUR_GCP_CREDENTIALS_JSON
 ```
 go run main.go
 ```
+
+or
+
+```
+make build
+```
