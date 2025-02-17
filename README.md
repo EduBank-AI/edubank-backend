@@ -8,19 +8,21 @@ A backend service built using Go, designed to generate smart questions for tests
 
 - Google Cloud API credentials
 
+#### Clone the repository
 ```
-# Clone the repository
 git clone https://github.com/EduBank-AI/edubank-BE.git
 cd eduBank-BE
-
-# Install dependencies
+```
+#### Install dependencies
+```
 go mod tidy
-
-# Set up environment variables
+```
+#### Set up environment variables
+```
 touch .env
 ```
 
-### Edit .env file with your database, API keys, and secret configurations
+#### Edit .env file with your database, API keys, and secret configurations
 
 ```
 GEMINI_API_KEY= YOUR_GEMINIAPI_KEY
