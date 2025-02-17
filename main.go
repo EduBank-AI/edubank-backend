@@ -20,8 +20,8 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	videoFile := "video.mp4"
-	audioFile := "audio.wav"
+	videoFile := "./assets/video.mp4"
+	audioFile := "./assets/audio.wav"
 
 	// Step 1: Extract audio from video
 	fmt.Println("Extracting audio...")
