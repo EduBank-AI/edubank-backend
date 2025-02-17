@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -16,7 +15,6 @@ import (
 )
 
 func main() {
-	// Load environment variables
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
@@ -72,7 +70,7 @@ func transcribeAudio(audioPath string) (string, error) {
 	defer client.Close()
 
 	// Read the audio file
-	audioData, err := ioutil.ReadFile(audioPath)
+	audioData, err := os.ReadFile(audioPath)
 	if err != nil {
 		return "", err
 	}
@@ -116,11 +114,10 @@ func sendToGemini(text string) (string, error) {
 	}
 	defer client.Close()
 
-	// Specify the model
 	model := client.GenerativeModel("gemini-2.0-flash-001")
 
-	// Create the prompt for summarization
-	prompt := "Analyse the text and create a question bank of 3 multiple choice questions with one option correct along with their answers from different topics if possible. I want the output you give me to be in a specifc format. Question<Question Number>(next line)<Question><All options labeled a,b,c,d>(Next Line)Answer<Answer Number>(next line)<Answer>\n" + text
+	// Summarisation prompt
+	prompt := "Analyse the text and create a question bank of 3 multiple choice questions with one option correct along with their answers from different topics if possible. I want the output you give me to be in a specifc format therefore do not include nay other lines of text or filler sentences before giving the main output. Question<Question Number>(next line)<Question><All options labeled a,b,c,d>(Next Line)Answer<Answer Number>(next line)<Answer>\n" + text
 
 	// Generate the content
 	resp, err := model.GenerateContent(ctx, genai.Text(prompt))
@@ -139,6 +136,5 @@ func sendToGemini(text string) (string, error) {
 		}
 	}
 
-	// Return an error if no response content is found
 	return "", fmt.Errorf("no response content found")
 }
