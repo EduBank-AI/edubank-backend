@@ -30,7 +30,7 @@ GOOGLE_APPLICATION_CREDENTIALS= YOUR_GCP_CREDENTIALS_JSON
 ```
 
 ### Add a reference video to the assets folder in the main directory
-- An example video.mp4 has been provided to get started
+- An example ```video.mp4``` has been provided to get started
 
 ## Run the application
 
