@@ -1,55 +1,144 @@
 package main
 
 import (
-	"bytes"
-	"encoding/base64"
-	"encoding/json"
+	"context"
 	"fmt"
 	"io/ioutil"
 	"log"
-	"net/http"
 	"os"
+	"os/exec"
+
+	speech "cloud.google.com/go/speech/apiv1"
+	"github.com/google/generative-ai-go/genai"
+	"github.com/joho/godotenv"
+	"google.golang.org/api/option"
+	speechpb "google.golang.org/genproto/googleapis/cloud/speech/v1"
 )
 
-const apiKey = "YOUR_GOOGLE_CLOUD_VISION_API_KEY" // Replace with your API Key
-
 func main() {
-	imagePath := "image.jpg"
-	imageData, err := os.ReadFile(imagePath)
+	// Load environment variables
+	err := godotenv.Load()
 	if err != nil {
-		log.Fatalf("Failed to read image: %v", err)
+		log.Fatal("Error loading .env file")
 	}
 
-	encodedImage := base64.StdEncoding.EncodeToString(imageData)
+	videoFile := "video.mp4"
+	audioFile := "audio.wav"
 
-	requestBody, err := json.Marshal(map[string]interface{}{
-		"requests": []map[string]interface{}{
-			{
-				"image": map[string]string{
-					"content": encodedImage,
-				},
-				"features": []map[string]string{
-					{"type": "TEXT_DETECTION"},
-				},
-			},
+	// Step 1: Extract audio from video
+	fmt.Println("Extracting audio...")
+	err = extractAudio(videoFile, audioFile)
+	if err != nil {
+		log.Fatalf("Audio extraction failed: %v", err)
+	}
+	fmt.Println("Audio extracted successfully!")
+
+	// Step 2: Transcribe audio to text
+	fmt.Println("Transcribing audio...")
+	transcribedText, err := transcribeAudio(audioFile)
+	if err != nil {
+		log.Fatalf("Transcription failed: %v", err)
+	}
+	fmt.Println("Transcription complete!")
+
+	// Step 3: Send transcribed text to Gemini API for summarization
+	fmt.Println("Sending text to Gemini API for summarization...")
+	summarizedText, err := sendToGemini(transcribedText)
+	if err != nil {
+		log.Fatalf("Gemini API call failed: %v", err)
+	}
+
+	// Output the transcribed text and summarized text
+	fmt.Println("\n--- Transcribed Text ---")
+	fmt.Println(transcribedText)
+
+	fmt.Println("\n--- Gemini Response (Summarized Text) ---")
+	fmt.Println(summarizedText)
+}
+
+// Extracts audio from the video using ffmpeg and converts it to mono
+func extractAudio(videoPath, audioPath string) error {
+	cmd := exec.Command("ffmpeg", "-i", videoPath, "-vn", "-ac", "1", "-ar", "16000", "-acodec", "pcm_s16le", audioPath, "-y")
+	return cmd.Run()
+}
+
+// Transcribes audio to text using Google Speech-to-Text API
+func transcribeAudio(audioPath string) (string, error) {
+	ctx := context.Background()
+	client, err := speech.NewClient(ctx)
+	if err != nil {
+		return "", err
+	}
+	defer client.Close()
+
+	// Read the audio file
+	audioData, err := ioutil.ReadFile(audioPath)
+	if err != nil {
+		return "", err
+	}
+
+	// Prepare the request
+	req := &speechpb.RecognizeRequest{
+		Config: &speechpb.RecognitionConfig{
+			Encoding:     speechpb.RecognitionConfig_LINEAR16, // Assuming audio is in LINEAR16 format
+			LanguageCode: "en-US",
 		},
-	})
-	if err != nil {
-		log.Fatalf("Failed to create JSON request: %v", err)
+		Audio: &speechpb.RecognitionAudio{
+			AudioSource: &speechpb.RecognitionAudio_Content{Content: audioData},
+		},
 	}
 
-	url := fmt.Sprintf("https://vision.googleapis.com/v1/images:annotate?key=%s", apiKey)
-	resp, err := http.Post(url, "application/json", bytes.NewBuffer(requestBody))
+	// Call Speech-to-Text API
+	resp, err := client.Recognize(ctx, req)
 	if err != nil {
-		log.Fatalf("Failed to send request: %v", err)
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatalf("Failed to read response: %v", err)
+		return "", err
 	}
 
-	fmt.Println("OCR Response:")
-	fmt.Println(string(body))
+	// Collect transcribed text
+	var transcript string
+	for _, result := range resp.Results {
+		for _, alt := range result.Alternatives {
+			transcript += alt.Transcript + " "
+		}
+	}
+	return transcript, nil
+}
+
+// Sends transcribed text to Gemini API for summarization
+func sendToGemini(text string) (string, error) {
+	ctx := context.Background()
+	apiKey := os.Getenv("GEMINI_API_KEY")
+
+	// Create a new Gemini client using the API key
+	client, err := genai.NewClient(ctx, option.WithAPIKey(apiKey))
+	if err != nil {
+		return "", fmt.Errorf("error creating client: %v", err)
+	}
+	defer client.Close()
+
+	// Specify the model
+	model := client.GenerativeModel("gemini-2.0-flash-001")
+
+	// Create the prompt for summarization
+	prompt := "Analyse the text and create a question bank of 3 multiple choice questions with one option correct along with their answers from different topics if possible. I want the output you give me to be in a specifc format. Question<Question Number>(next line)<Question><All options labeled a,b,c,d>(Next Line)Answer<Answer Number>(next line)<Answer>\n" + text
+
+	// Generate the content
+	resp, err := model.GenerateContent(ctx, genai.Text(prompt))
+	if err != nil {
+		return "", fmt.Errorf("error generating content: %v", err)
+	}
+
+	// Check if the response contains candidates and extract the summarized text
+	if len(resp.Candidates) > 0 && len(resp.Candidates[0].Content.Parts) > 0 {
+		summary, ok := resp.Candidates[0].Content.Parts[0].(genai.Text)
+		if ok {
+			// Return the summarized text
+			return string(summary), nil
+		} else {
+			return "", fmt.Errorf("unexpected response format: could not extract text")
+		}
+	}
+
+	// Return an error if no response content is found
+	return "", fmt.Errorf("no response content found")
 }

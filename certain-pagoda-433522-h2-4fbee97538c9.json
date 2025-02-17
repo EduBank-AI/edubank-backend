@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "certain-pagoda-433522-h2",
+  "private_key_id": "4fbee97538c947c9be02f09c38824a92242d9502",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCr/4CJWkHOi7p4\nzwOMFmcU3p/DXi9NNjyxiDPewv2d1PsBr9jw7oZNBfsp99yMqPU6tGs+bNEGGDTa\nU1O48npT1X6e/A927k0zI4nqchMiZ9DvCRRm9O+UfMTtIORmqD/lbtrL1DV3rvtl\n4oJqjGBWb+8Id3B7nbYu4yQUY9ArRtgHl9MxoZZl9RdRay+89sbAisiEFM9B+ArB\nemTI8gUobnMdMyFracTZSJj5i7KbavXc4B3YRHWHQBysugayoJH1cVge7ri13n/G\n9f3uybzmLoWUG/C7GNvyYIa49I33/lRbm0dFAcgEm/NtxbZKTTK51kulzHrhLlTS\nxhNVxegLAgMBAAECggEADuv0r8sycwPbop17Fk00ljKWM7HZHV67jJS0w0+xXF8H\ng7xIxZDmpTSuoekiANtWTciB7AGEGijsH5Yjvk4zCfuMp6hV2HXmIVik9L+pefj9\nvwR6TlBTn1M6a8QdweuOLOPIJu97JVil8M83jJzZwsX6kTEjg2X0Ue8Hc0lm3Eoo\nQmlw4J2ZQ8bZLxwFnzqVZiZYgXNfkNAVPMUz43+wItu4KWcP+u5xtPCPdTv1Ovzz\nuXoOrel5GrFwlQYHF+x6hkyvQ0KzDzVYx8VXtU1y8ZvYQAqd8TSAGYMOEooDWl+z\n8swm51MCuJSVKn7SnOuYMuFdUqs6ZZ+FH0CoqUC0KQKBgQDj7oq3u6eXjr2EK9wr\nGgZB4nhMVGJQOOeDHFU8kn6NeOEmS51ig4xbWbYLEjzxwk12AzQXz2PKYaU6FMoh\nn7f/TqVRuhzcJRmqMVUb1LhOaaBDykYV36cUnpFUQcIRRPWM+RorYbTQSn5chPDm\nDAYs34sdnTkUhlH4YJa1PZ79bwKBgQDBLavegj9ABU2YEkdKISqxlv0J2IDY7Y4H\nWBJaDerJWjhZ3t9Uhpc39879myaZg2S6SgFiiJAlrw7yz9TQcHnKORclsGOnnqIq\nSYPKSMhQaCstXfH7SJiqvFJUghbr3WpwjZbW9mFcuP3Ek6xvikGRxUV7gYElgogw\nnc9BytOpJQKBgQDUKNPCFc/3iIvrHRBApmawqOak1d71ISKNra/BQ/K8KIoaJUQH\n0L6ywRxrzbwgpGWJtY2lpAsU9DLhjzxec9bGtCO5oO0AFSCAhI7d6vDrO/JLZ1o5\nPga9cKOBs/u6K2AMqkmrm7S8NLrNz4iT+Rk+Z42MMS5SZnyiHvXpGcSFzQKBgE84\nZ48sYrvicNu4QzwHNfb2MHblLpHHecNRPtVnd61zLkDMwVFskH8HRP+DrOSvmZM7\n3i2GS3bov3yb9m40cf2YRAHUwElxKJem5kECcANpdKt6J04hi1oZOLonTzcS6h+W\nMRGeoHbh9k+zL7fePt2ExOXNSiUTzr4BOYmFoB9xAoGBALjjqEOzb9tyisn5I8Ds\ndgGren30THlaP5EuZDXLTyxf5gg0whU0QW7i/F4u2fgFgAKim86syRaYNl7g4GnF\nXMoD66NwsqB8bLQ7z8MZlhsAnS21jiFkfS3mH3/xwwE6LHj4bS7wDM98wsPCQwBh\nEqpzpr+EO36hRvEZo3Drj1ig\n-----END PRIVATE KEY-----\n",
+  "client_email": "edubank-ai@certain-pagoda-433522-h2.iam.gserviceaccount.com",
+  "client_id": "101356800644897469336",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/edubank-ai%40certain-pagoda-433522-h2.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
