@@ -4,15 +4,16 @@ import (
 	"context"
 	"fmt"
 	"path/filepath"
+
 	// "io/ioutil"
 	// "log"
 	"os"
 	// "unicode/utf8"
+	"errors"
 	"image"
 	"image/png"
-	"log"
 	"io/fs"
-	"errors"
+	"log"
 
 	vision "cloud.google.com/go/vision/apiv1"
 	"github.com/google/generative-ai-go/genai"
@@ -102,7 +103,6 @@ func pdfSendToGemini(text string) (string, error) {
 	return "", fmt.Errorf("no response content found")
 }
 
-
 // Convert each page of a PDF into a PNG image.
 func extractPDFPagesAsImages(pdfPath string, outputDir string) error {
 	// Open the PDF file
@@ -170,7 +170,6 @@ func renderPDFPageToImage(pdfReader *model.PdfReader, pageIndex int) (image.Imag
 
 // Extract the text from image
 func imgToText(file string) (string, error) {
-	os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", "config.json")
 
 	ctx := context.Background()
 

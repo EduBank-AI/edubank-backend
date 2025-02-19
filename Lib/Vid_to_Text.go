@@ -10,22 +10,16 @@ import (
 
 	speech "cloud.google.com/go/speech/apiv1"
 	"github.com/google/generative-ai-go/genai"
-	"github.com/joho/godotenv"
 	"google.golang.org/api/option"
 	speechpb "google.golang.org/genproto/googleapis/cloud/speech/v1"
 )
 
 func VidToText(videoFile string, audioFile string) {
-	// Load environment variables
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
 
 	// Step 1: Extract audio from video
 	fmt.Println("Extracting audio...")
-	err = extractAudio(videoFile, audioFile)
-	if err != nil {	
+	err := extractAudio(videoFile, audioFile)
+	if err != nil {
 		log.Fatalf("Audio extraction failed: %v", err)
 	}
 
@@ -115,7 +109,7 @@ func vidSendToGemini(text string) (string, error) {
 	model := client.GenerativeModel("gemini-2.0-flash-001")
 
 	// Create the prompt for summarization
-	prompt := "Analyze the text and return more logical version of the text also clean it a bit. Add double star for heading, single star for subheading, etc beautify the output a bit. Do not summarize it. And also do not show anything else other than the text" + text
+	prompt := "Analyze the given text and generate a question bank consisting of 3 multiple-choice questions from different topics. Each question should have exactly four answer choices labeled as a, b, c, and d, with only one correct answer. Format the output as follows:\nQuestion<Question Number>\n<Question>\na) <Option 1>\nb) <Option 2>\nc) <Option 3>\nd) <Option 4>\nAnswer<Answer Number>\n<Option value> <Answer>\nDo not include any extra text, explanations, or filler sentences outside this structure." + text
 
 	// Generate the content
 	resp, err := model.GenerateContent(ctx, genai.Text(prompt))
