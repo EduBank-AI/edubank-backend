@@ -10,22 +10,16 @@ import (
 
 	speech "cloud.google.com/go/speech/apiv1"
 	"github.com/google/generative-ai-go/genai"
-	"github.com/joho/godotenv"
 	"google.golang.org/api/option"
 	speechpb "google.golang.org/genproto/googleapis/cloud/speech/v1"
 )
 
 func VidToText(videoFile string, audioFile string) {
-	// Load environment variables
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
 
 	// Step 1: Extract audio from video
 	fmt.Println("Extracting audio...")
-	err = extractAudio(videoFile, audioFile)
-	if err != nil {	
+	err := extractAudio(videoFile, audioFile)
+	if err != nil {
 		log.Fatalf("Audio extraction failed: %v", err)
 	}
 

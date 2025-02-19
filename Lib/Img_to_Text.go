@@ -14,7 +14,6 @@ import (
 
 // detectDocumentText gets the full document text from the Vision API for an image at the given file path.
 func ImgToText(w io.Writer, file string) {
-	os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", "config.json")
 	ctx := context.Background()
 
 	fmt.Println("Extracting text from the image")

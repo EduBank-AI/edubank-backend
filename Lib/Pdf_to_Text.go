@@ -169,7 +169,6 @@ func renderPDFPageToImage(pdfReader *model.PdfReader, pageIndex int) (image.Imag
 
 // Extract the text from image
 func imgToText(file string) (string, error) {
-	os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", "config.json")
 
 	ctx := context.Background()
 
