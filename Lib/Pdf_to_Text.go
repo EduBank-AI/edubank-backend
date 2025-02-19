@@ -43,7 +43,7 @@ func PdfToText(pdfFilePath string) {
 		if !d.IsDir() {
 			extractedText, err := imgToText(path)
 			if err != nil {
-				log.Fatalf("Error in extracting tet from the images: %v", err)
+				log.Fatalf("Error in extracting text from the images: %v", err)
 			}
 
 			// Step 3: Send the extracted text to gemini for cleanup

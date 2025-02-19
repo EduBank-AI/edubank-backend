@@ -17,9 +17,9 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	// file := "Assets/video.mp4"
+	file := "Assets/video.mp4"
 	// file := "Assets/image.png"
-	file := "Assets/5.2 The Definite Integral (and review of Riemann sums).pdf"
+	// file := "Assets/5.2 The Definite Integral (and review of Riemann sums).pdf"
 
 	if strings.HasSuffix(strings.ToLower(file), ".pdf") {
 		fmt.Println("Starting PDF to text conversion...")
