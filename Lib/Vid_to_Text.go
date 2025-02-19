@@ -115,7 +115,7 @@ func vidSendToGemini(text string) (string, error) {
 	model := client.GenerativeModel("gemini-2.0-flash-001")
 
 	// Create the prompt for summarization
-	prompt := "Analyze the text and return more logical version of the text also clean it a bit. Add double star for heading, single star for subheading, etc beautify the output a bit. Do not summarize it. And also do not show anything else other than the text" + text
+	prompt := "Analyze the text and return more logical version of the text also clean it a bit. Add double star for heading, single star for subheading, etc beautify the output a bit. Do not summarize it. And also do not show anything else other than the text. If the formatted text is perfect then just return the text\n" + text
 
 	// Generate the content
 	resp, err := model.GenerateContent(ctx, genai.Text(prompt))

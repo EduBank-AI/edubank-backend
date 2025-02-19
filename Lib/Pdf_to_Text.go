@@ -2,17 +2,14 @@ package Lib
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"path/filepath"
-	// "io/ioutil"
-	// "log"
-	"os"
-	// "unicode/utf8"
 	"image"
 	"image/png"
-	"log"
 	"io/fs"
-	"errors"
+	"log"
+	"os"
+	"path/filepath"
 
 	vision "cloud.google.com/go/vision/apiv1"
 	"github.com/google/generative-ai-go/genai"
@@ -37,6 +34,7 @@ func PdfToText(pdfFilePath string) {
 
 	// Step 2: Extract the text from each image
 	fmt.Println("Extracting text from each image and sending it to gemini for cleanup")
+	pageNo := 1
 	err := filepath.WalkDir(outputDir, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			log.Fatal(err)
@@ -52,14 +50,16 @@ func PdfToText(pdfFilePath string) {
 			finalText, err = pdfSendToGemini(extractedText)
 			if err != nil {
 				log.Fatalf("Error in sending text to gemini: %v", err)
+			} else {
+				fmt.Printf("Extracted text from page number %d: \n%s", pageNo, finalText)
+				pageNo += 1
 			}
 		}
+		fmt.Printf("\n\n\n")
 		return nil
 	})
 	if err != nil {
 		log.Fatal(err)
-	} else {
-		fmt.Printf("Extracted text: \n%s", finalText)
 	}
 }
 
@@ -79,7 +79,7 @@ func pdfSendToGemini(text string) (string, error) {
 	model := client.GenerativeModel("gemini-2.0-flash-001")
 
 	// Create the prompt for summarization
-	prompt := "Analyze the pdf and return the contents of the pdf in normal text format. Add double star for heading, single star for subheading, etc beautify the output a bit. Clean the text a bit like make the equations look good, etc. Read all the equations properly and solve them if unsolved. Do not summarize it and do not add etra texts like Here is the output, etc and show all the contents\n" + text
+	prompt := "Analyze the pdf and return the contents of the pdf in normal text format. Add double star for heading, single star for subheading, etc beautify the output a bit. Clean the text a bit like make the equations look good, etc. Read all the equations properly and solve them if unsolved. Do not summarize it and do not add etra texts like Here is the output, etc and show all the contents. If the formatted text is perfect then just return the text\n" + text
 
 	// Generate the content
 	resp, err := model.GenerateContent(ctx, genai.Text(prompt))
@@ -101,7 +101,6 @@ func pdfSendToGemini(text string) (string, error) {
 	// Return an error if no response content is found
 	return "", fmt.Errorf("no response content found")
 }
-
 
 // Convert each page of a PDF into a PNG image.
 func extractPDFPagesAsImages(pdfPath string, outputDir string) error {

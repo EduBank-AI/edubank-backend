@@ -73,7 +73,7 @@ func imgSendToGemini(text string) (string, error) {
 	model := client.GenerativeModel("gemini-2.0-flash-001")
 
 	// Create the prompt for summarization
-	prompt := "Analyze the text contents. Clean the text a bit like make the equations look good, etc. Do not summarize it and show all the contents\n" + text
+	prompt := "Analyze the text contents. Clean the text a bit like make the equations look good, etc. Do not summarize it and show all the contents. If the formatted text is perfect then just return the text\n" + text
 
 	// Generate the content
 	resp, err := model.GenerateContent(ctx, genai.Text(prompt))
