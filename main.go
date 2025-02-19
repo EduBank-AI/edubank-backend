@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"os"
 	"strings"
 
 	"github.com/edubank/Lib"
@@ -20,7 +19,6 @@ func main() {
 
 	// file := "Assets/video.mp4"
 	// file := "Assets/image.png"
-	// file := "Assets/5.2 The Definite Integral (and review of Riemann sums).pdf"
 	file := "Assets/5.2 The Definite Integral (and review of Riemann sums).pdf"
 
 	if strings.HasSuffix(strings.ToLower(file), ".pdf") {
