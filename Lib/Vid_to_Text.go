@@ -14,7 +14,7 @@ import (
 	speechpb "google.golang.org/genproto/googleapis/cloud/speech/v1"
 )
 
-func VidToText(videoFile string, audioFile string) {
+func VidToText(videoFile string, audioFile string) (string, error) {
 
 	// Step 1: Extract audio from video
 	fmt.Println("Extracting audio...")
@@ -27,22 +27,21 @@ func VidToText(videoFile string, audioFile string) {
 	fmt.Println("Transcribing audio...")
 	transcribedText, err := transcribeAudio(audioFile)
 	if err != nil {
-		log.Fatalf("Transcription failed: %v", err)
+		return "", err
 	}
 
 	// Step 3: Send transcribed text to Gemini API for summarization
 	fmt.Println("Sending text to Gemini API for summarization...")
 	summarizedText, err := vidSendToGemini(transcribedText)
 	if err != nil {
-		log.Fatalf("Gemini API call failed: %v", err)
+		return "", err
 	}
 
 	// Output the transcribed text and summarized text
 	// fmt.Println("\n--- Transcribed Text ---")
-	// fmt.Println(transcribedText)
-
-	fmt.Println("\n--- Gemini Response (Summarized Text) ---")
 	fmt.Println(summarizedText)
+
+	return summarizedText, nil
 }
 
 // Extracts audio from the video using ffmpeg and converts it to mono

@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"log"
 	"os"
 
 	vision "cloud.google.com/go/vision/apiv1"
@@ -13,7 +12,9 @@ import (
 )
 
 // detectDocumentText gets the full document text from the Vision API for an image at the given file path.
-func ImgToText(w io.Writer, file string) {
+func ImgToText(w io.Writer, file string) (string, error) {
+	output := ""
+
 	ctx := context.Background()
 
 	fmt.Println("Extracting text from the image")
@@ -21,24 +22,24 @@ func ImgToText(w io.Writer, file string) {
 	// Define the vision client
 	client, err := vision.NewImageAnnotatorClient(ctx)
 	if err != nil {
-		log.Fatalf("Error defining the vision client: %v", err)
+		return "", err
 	}
 
 	// Open the image file
 	f, err := os.Open(file)
 	if err != nil {
-		log.Fatalf("Error opening the image file: %v", err)
+		return "", err
 	}
 	defer f.Close()
 
 	// Step 1: Use vision to read the image and extract the text
 	image, err := vision.NewImageFromReader(f)
 	if err != nil {
-		log.Fatalf("Error reading the image: %v", err)
+		return "", err
 	}
 	annotation, err := client.DetectDocumentText(ctx, image, nil)
 	if err != nil {
-		log.Fatalf("Error detecting the tet: %v", err)
+		return "", err
 	}
 
 	// Check if the extracted text is empty or not
@@ -49,11 +50,11 @@ func ImgToText(w io.Writer, file string) {
 		fmt.Println("Sending the text to Gemini for cleanup")
 		cleanOutput, err := imgSendToGemini(annotation.Text)
 		if err != nil {
-			log.Fatalf("Error in summarizing the text: %v", err)
-		} else {
-			fmt.Fprintf(w, "Extracted text: \n%s", cleanOutput)
+			return "", err
 		}
+		output = cleanOutput
 	}
+	return output, nil
 }
 
 // Use gemini to cleanup the extrcated text

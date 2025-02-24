@@ -7,7 +7,6 @@ import (
 	"image"
 	"image/png"
 	"io/fs"
-	"log"
 	"os"
 	"path/filepath"
 
@@ -18,7 +17,7 @@ import (
 	"google.golang.org/api/option"
 )
 
-func PdfToText(pdfFilePath string) {
+func PdfToText(pdfFilePath string) ([]PageData, error) {
 	// Setup the directory where PNGs will be saved
 	outputDir := "Assets/"
 	outputDir = fmt.Sprintf("%s_images", pdfFilePath[:len(pdfFilePath)-len(".pdf")])
@@ -34,33 +33,34 @@ func PdfToText(pdfFilePath string) {
 
 	// Step 2: Extract the text from each image
 	fmt.Println("Extracting text from each image and sending it to gemini for cleanup")
+	var pages []PageData
 	pageNo := 1
 	err := filepath.WalkDir(outputDir, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
-			log.Fatal(err)
 			return err
 		}
 		if !d.IsDir() {
 			extractedText, err := imgToText(path)
 			if err != nil {
-				log.Fatalf("Error in extracting text from the images: %v", err)
+				return err
 			}
 
 			// Step 3: Send the extracted text to gemini for cleanup
 			finalText, err = pdfSendToGemini(extractedText)
 			if err != nil {
-				log.Fatalf("Error in sending text to gemini: %v", err)
+				return err
 			} else {
-				fmt.Printf("Extracted text from page number %d: \n%s", pageNo, finalText)
+				pages = append(pages, PageData{Page: pageNo, Text: finalText})
 				pageNo += 1
 			}
 		}
-		fmt.Printf("\n\n\n")
 		return nil
 	})
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
+
+	return pages, nil
 }
 
 // Use gemini to cleanup the extrcated text
