@@ -3,6 +3,7 @@ package Lib
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"strings"
 )
@@ -10,7 +11,7 @@ import (
 // Struct for storing extracted text from PDF pages
 type PageData struct {
 	Page int    `json:"page"`
-	Text string `json:"text"`
+	Text string `json:"content"`
 }
 
 // Struct for PDF JSON format
@@ -18,9 +19,9 @@ type PDFExtracted struct {
 	Pages []PageData `json:"pages"`
 }
 
-// Struct for AI-friendly JSONL formatting
-type AIFormatted struct {
-	Text string `json:"text"`
+type Data struct {
+	Topic   string      `json:"topic"`
+	Content interface{} `json:"content"`
 }
 
 // Function to extract the filename from the given text
@@ -47,32 +48,112 @@ func cleanText(text string) string {
 
 // Save extracted PDF text in a structured JSON
 func savePDFAsJSON(pages []PageData, filename string) error {
-	file, err := os.Create("Json/" + filename + ".json")
+	var data []Data
+	jsonFileName := "dataset.jsonl"
+
+	_, err := os.Stat(jsonFileName)
+	if os.IsNotExist(err) {
+		createdFile, err := os.Create(jsonFileName)
+		if err != nil {
+			fmt.Println("Error making file: ", err)
+			return err
+		}
+		defer createdFile.Close()
+
+		_, err = createdFile.WriteString("[]")
+		if err != nil {
+			fmt.Println("Error writing file: ", err)
+			return err
+		}
+	}
+
+	file, err := ioutil.ReadFile(jsonFileName)
 	if err != nil {
+		fmt.Println("Error reading file: ", err)
 		return err
 	}
-	defer file.Close()
 
-	data := PDFExtracted{Pages: pages}
-	jsonData, _ := json.MarshalIndent(data, "", "  ")
+	err = json.Unmarshal(file, &data)
+	if err != nil {
+		fmt.Println("Error unmarshalling JSON:", err)
+		return err
+	}
 
-	_, err = file.WriteString(string(jsonData))
-	return err
+	newTopic := Data{
+		Topic:   filename,
+		Content: pages,
+	}
+
+	data = append(data, newTopic)
+	updatedJSON, err := json.MarshalIndent(data, "", "  ")
+	if err != nil {
+		fmt.Println("Error marshalling JSON:", err)
+		return err
+	}
+
+	err = ioutil.WriteFile(jsonFileName, updatedJSON, 0644)
+	if err != nil {
+		fmt.Println("Error writing file:", err)
+		return err
+	}
+
+	fmt.Println("Data added!")
+	return nil
 }
 
 // Save extracted image text as JSONL (AI-friendly)
 func saveImageAsJSONL(text string, filename string) error {
-	file, err := os.Create("Json/" + filename + ".jsonl")
+	var data []Data
+	jsonFileName := "dataset.jsonl"
+
+	_, err := os.Stat(jsonFileName)
+	if os.IsNotExist(err) {
+		createdFile, err := os.Create(jsonFileName)
+		if err != nil {
+			fmt.Println("Error making file: ", err)
+			return err
+		}
+		defer createdFile.Close()
+
+		_, err = createdFile.WriteString("[]")
+		if err != nil {
+			fmt.Println("Error writing file: ", err)
+			return err
+		}
+	}
+
+	file, err := ioutil.ReadFile(jsonFileName)
 	if err != nil {
+		fmt.Println("Error reading file: ", err)
 		return err
 	}
-	defer file.Close()
 
-	entry := AIFormatted{Text: text}
-	jsonData, _ := json.Marshal(entry)
+	err = json.Unmarshal(file, &data)
+	if err != nil {
+		fmt.Println("Error unmarshalling JSON:", err)
+		return err
+	}
 
-	_, err = file.WriteString(string(jsonData) + "\n")
-	return err
+	newTopic := Data{
+		Topic:   filename,
+		Content: text,
+	}
+
+	data = append(data, newTopic)
+	updatedJSON, err := json.MarshalIndent(data, "", "  ")
+	if err != nil {
+		fmt.Println("Error marshalling JSON:", err)
+		return err
+	}
+
+	err = ioutil.WriteFile(jsonFileName, updatedJSON, 0644)
+	if err != nil {
+		fmt.Println("Error writing file:", err)
+		return err
+	}
+
+	fmt.Println("Data added!")
+	return nil
 }
 
 func Format(pages []PageData, imageText string) {
@@ -95,7 +176,7 @@ func Format(pages []PageData, imageText string) {
 		if err != nil {
 			fmt.Println("Error saving file:", err)
 		} else {
-			fmt.Println("File saved as:", filename+".jsonl")
+			fmt.Println("File saved as: dataset.jsonl")
 		}
 	} else {
 		fmt.Println("no valid input provided")

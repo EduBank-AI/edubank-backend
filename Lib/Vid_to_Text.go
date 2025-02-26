@@ -39,7 +39,6 @@ func VidToText(videoFile string, audioFile string) (string, error) {
 
 	// Output the transcribed text and summarized text
 	// fmt.Println("\n--- Transcribed Text ---")
-	fmt.Println(summarizedText)
 
 	return summarizedText, nil
 }
