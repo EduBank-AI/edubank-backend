@@ -6,7 +6,7 @@ require (
 	cloud.google.com/go/speech v1.26.0
 	cloud.google.com/go/vision v1.2.0
 	github.com/google/generative-ai-go v0.19.0
-	github.com/joho/godotenv v1.5.1
+	// github.com/joho/godotenv v1.5.1
 	github.com/unidoc/unipdf/v3 v3.66.0
 	google.golang.org/api v0.214.0
 	google.golang.org/genproto v0.0.0-20250212204824-5a70512c5d8b
@@ -34,6 +34,7 @@ require (
 	github.com/googleapis/enterprise-certificate-proxy v0.3.4 // indirect
 	github.com/googleapis/gax-go/v2 v2.14.0 // indirect
 	github.com/gorilla/i18n v0.0.0-20150820051429-8b358169da46 // indirect
+	github.com/joho/godotenv v1.5.1
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/stretchr/testify v1.10.0 // indirect
