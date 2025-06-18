@@ -4,23 +4,19 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"image"
-	"image/png"
+	"os/exec"
 	"io/fs"
 	"os"
 	"path/filepath"
 
 	vision "cloud.google.com/go/vision/apiv1"
 	"github.com/google/generative-ai-go/genai"
-	"github.com/unidoc/unipdf/v3/model"
-	"github.com/unidoc/unipdf/v3/render"
 	"google.golang.org/api/option"
 )
 
 func PdfToText(pdfFilePath string) ([]PageData, error) {
 	// Setup the directory where PNGs will be saved
-	outputDir := "Assets/"
-	outputDir = fmt.Sprintf("%s_images", pdfFilePath[:len(pdfFilePath)-len(".pdf")])
+	outputDir := fmt.Sprintf("%s_images", pdfFilePath[:len(pdfFilePath)-len(".pdf")])
 	if _, err := os.Stat(outputDir); os.IsNotExist(err) {
 		os.Mkdir(outputDir, os.ModePerm)
 	}
@@ -104,67 +100,15 @@ func pdfSendToGemini(text string) (string, error) {
 
 // Convert each page of a PDF into a PNG image.
 func extractPDFPagesAsImages(pdfPath string, outputDir string) error {
-	// Open the PDF file
-	f, err := os.Open(pdfPath)
-	if err != nil {
+	fmt.Println("Converting PDF to images...")
+	cmd := exec.Command("pdftoppm", "-png", pdfPath, filepath.Join(outputDir, "page"))
+	
+	if err := cmd.Run(); err != nil {
+		fmt.Printf("Error converting PDF to images: %v\n", err)
 		return err
-	}
-	defer f.Close()
-
-	// Read the PDF document
-	doc, err := model.NewPdfReader(f)
-	if err != nil {
-		return err
-	}
-
-	// Iterate over each page
-	numPages, err := doc.GetNumPages()
-	if err != nil {
-		return err
-	}
-	for i := 0; i < numPages; i++ {
-		_, err := doc.GetPage(i + 1)
-		if err != nil {
-			return err
-		}
-
-		// Render the page to an image
-		img, err := renderPDFPageToImage(doc, i+1)
-		if err != nil {
-			return err
-		}
-
-		// Save the image as PNG
-		outputFilePath := fmt.Sprintf("%s/page_%d.png", outputDir, i+1)
-		outFile, err := os.Create(outputFilePath)
-		if err != nil {
-			return err
-		}
-		defer outFile.Close()
-
-		err = png.Encode(outFile, img)
-		if err != nil {
-			return err
-		}
 	}
 
 	return nil
-}
-
-// Placeholder function (requires PDF rendering library).
-func renderPDFPageToImage(pdfReader *model.PdfReader, pageIndex int) (image.Image, error) {
-	page, err := pdfReader.GetPage(pageIndex)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get page %d: %w", pageIndex, err)
-	}
-
-	r := render.NewImageDevice()
-	img, err := r.RenderWithOpts(page, false)
-	if err != nil {
-		return nil, fmt.Errorf("failed to render page %d: %w", pageIndex, err)
-	}
-
-	return img, nil
 }
 
 // Extract the text from image

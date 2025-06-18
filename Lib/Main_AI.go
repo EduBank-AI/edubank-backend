@@ -116,15 +116,17 @@ func (qa *QASystem) FindRelevantContent(question string) []string {
 	// First, look for topic matches
 	for _, topic := range qa.topics {
 		topicNormalized := strings.ToLower(strings.Replace(topic.Topic, "_", " ", -1))
+		fmt.Println("Comparing to topic:", topicNormalized)
 
 		// Check if the topic is relevant to the question
 		if strings.Contains(questionLower, topicNormalized) ||
 			strings.Contains(questionLower, strings.ToLower(topic.Topic)) {
+				fmt.Println("Match found with topic:", topic.Topic)
 
-			// If we found a relevant topic, extract all content
-			for _, content := range topic.Content {
+				// If we found a relevant topic, extract all content
+				for _, content := range topic.Content {
 				relevantResults = append(relevantResults, content.Content)
-			}
+				}
 		}
 	}
 
@@ -140,7 +142,9 @@ func (qa *QASystem) FindRelevantContent(question string) []string {
 				// Check if content contains any keywords
 				for _, keyword := range keywords {
 					if strings.Contains(contentLower, keyword) {
+						
 						relevantResults = append(relevantResults, content.Content)
+						fmt.Println("Match found with topic:", relevantResults)
 						break // Only add each content once
 					}
 				}
@@ -186,6 +190,7 @@ func (qa *QASystem) QueryAI(question string, contextData []string) (string, erro
 	// Extract response text
 	if len(resp.Candidates) > 0 && len(resp.Candidates[0].Content.Parts) > 0 {
 		if textResp, ok := resp.Candidates[0].Content.Parts[0].(genai.Text); ok {
+			fmt.Println("Response from Gemini:", textResp)
 			return string(textResp), nil
 		}
 	}

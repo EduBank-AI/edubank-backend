@@ -97,7 +97,6 @@ func savePDFAsJSON(pages []PageData, filename string) error {
 		return err
 	}
 
-	fmt.Println("Data added!")
 	return nil
 }
 
@@ -152,7 +151,6 @@ func saveImageAsJSONL(text string, filename string) error {
 		return err
 	}
 
-	fmt.Println("Data added!")
 	return nil
 }
 
@@ -165,7 +163,7 @@ func Format(pages []PageData, imageText string) {
 		if err != nil {
 			fmt.Println("Error saving file:", err)
 		} else {
-			fmt.Println("File saved as:", filename+".jsonl")
+			fmt.Println("Data of ", filename+" added to dataset.jsonl")
 		}
 	} else if imageText != "" {
 		// If image text is provided, process image
@@ -176,7 +174,7 @@ func Format(pages []PageData, imageText string) {
 		if err != nil {
 			fmt.Println("Error saving file:", err)
 		} else {
-			fmt.Println("File saved as: dataset.jsonl")
+			fmt.Println("Data of ", filename+" added to dataset.jsonl")
 		}
 	} else {
 		fmt.Println("no valid input provided")

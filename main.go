@@ -1,33 +1,84 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"log"
 	"os"
 	"strings"
 
 	"github.com/edubank/Lib"
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
 
-func main() {
-	// Load environment variables
-	err := godotenv.Load()
+func setupRouter() *gin.Engine {
+	r := gin.Default()
+
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:3000"},
+		AllowMethods:     []string{"POST", "GET", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+	}))
+
+	r.POST("/load", handleFileLoad)
+	r.POST("/ai", handleAIRequest) // Add AI route
+
+	return r
+}
+
+func handleFileLoad(c *gin.Context) {
+	// Receive the file
+	file, err := c.FormFile("file")
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		c.JSON(400, gin.H{"error": "No file uploaded"})
+		return
 	}
 
-	// file := "Assets/video.mp4"
-	// file := "Assets/image.png"
-	file := "Assets/5.2 The Definite Integral (and review of Riemann sums).pdf"
+	// Save file to a temporary location
+	dst := "Assets/" + file.Filename
+	if err := c.SaveUploadedFile(file, dst); err != nil {
+		c.JSON(500, gin.H{"error": "Failed to save file"})
+		return
+	}
 
+	// Use your existing loadData function to process the file
+	go func() {
+		loadData(dst)
+	}()
+
+	// Respond to the frontend
+	c.JSON(200, gin.H{
+		"message":  "File processing started",
+		"filename": file.Filename,
+	})
+}
+
+func handleAIRequest(c *gin.Context) {
+	var request struct {
+		Question string `json:"question"`
+	}
+
+	if err := c.BindJSON(&request); err != nil {
+		c.JSON(400, gin.H{"error": "Invalid request"})
+		return
+	}
+
+	// Call AI function
+	answer := Lib.AI(request.Question)
+
+	c.JSON(200, gin.H{"answer": answer})
+}
+
+func loadData(file string) {
 	if strings.HasSuffix(strings.ToLower(file), ".pdf") {
 		fmt.Println("Starting PDF to text conversion...")
 		extractedOutput, err := Lib.PdfToText(file)
 
 		if err != nil {
-			fmt.Println("Error extracting pdf text")
+			fmt.Println("Error extracting pdf text: ", err)
 		}
 
 		fmt.Println("Sending text to JSON formatter")
@@ -39,7 +90,7 @@ func main() {
 		extractedOutput, err := Lib.VidToText(file, audioFile)
 
 		if err != nil {
-			fmt.Println("Error extracting pdf text")
+			fmt.Println("Error extracting video text")
 		}
 
 		fmt.Println("Sending text to JSON formatter")
@@ -49,30 +100,38 @@ func main() {
 		extractedOutput, err := Lib.ImgToText(os.Stdout, file)
 
 		if err != nil {
-			fmt.Println("Error extracting image text")
+			fmt.Println("Error extracting image text: ", err)
 		}
 
 		fmt.Println("Sending text to JSON formatter")
 		Lib.Format(nil, extractedOutput)
 	}
+}
 
-	fmt.Println("QA System initialized. Type 'exit' to quit.")
+func ai(question string) {
+	// fmt.Println("\nAsk a question:")
+	// reader := bufio.NewReader(os.Stdin)
+	// question, _ := reader.ReadString('\n')
+	// question = strings.TrimSpace(question)
 
-	for {
-		fmt.Println("\nAsk a question:")
+	fmt.Println("Processing your question...")
+	answer := Lib.AI(question)
+	fmt.Println("\nAnswer:")
+	fmt.Println(answer)
+}
 
-		reader := bufio.NewReader(os.Stdin)
-		question, _ := reader.ReadString('\n')
-		question = strings.TrimSpace(question)
+func main() {
+	// Load environment variables
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 
-		if strings.ToLower(question) == "exit" {
-			break
-		}
-
-		fmt.Println("Processing your question...")
-		answer := Lib.AI(question)
-
-		fmt.Println("\nAnswer:")
-		fmt.Println(answer)
+	// Start the server
+	r := setupRouter()
+	port := ":5000" // Change this if needed
+	fmt.Println("Server running on http://localhost" + port)
+	if err := r.Run(port); err != nil {
+		log.Fatal("Failed to start server: ", err)
 	}
 }

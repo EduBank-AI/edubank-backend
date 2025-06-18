@@ -8,6 +8,7 @@ import (
 
 	vision "cloud.google.com/go/vision/apiv1"
 	"github.com/google/generative-ai-go/genai"
+	"github.com/joho/godotenv"
 	"google.golang.org/api/option"
 )
 
@@ -20,12 +21,14 @@ func ImgToText(w io.Writer, file string) (string, error) {
 	fmt.Println("Extracting text from the image")
 
 	// Define the vision client
+	fmt.Println("Creating vision client")
 	client, err := vision.NewImageAnnotatorClient(ctx)
 	if err != nil {
 		return "", err
 	}
 
 	// Open the image file
+	fmt.Println("Opening image file")
 	f, err := os.Open(file)
 	if err != nil {
 		return "", err
@@ -33,6 +36,7 @@ func ImgToText(w io.Writer, file string) (string, error) {
 	defer f.Close()
 
 	// Step 1: Use vision to read the image and extract the text
+	fmt.Println("Reading image file")
 	image, err := vision.NewImageFromReader(f)
 	if err != nil {
 		return "", err
@@ -43,6 +47,7 @@ func ImgToText(w io.Writer, file string) (string, error) {
 	}
 
 	// Check if the extracted text is empty or not
+	fmt.Println("Checking if the text is empty")
 	if annotation == nil {
 		fmt.Fprintln(w, "No text found.")
 	} else {
@@ -59,6 +64,11 @@ func ImgToText(w io.Writer, file string) (string, error) {
 
 // Use gemini to cleanup the extrcated text
 func imgSendToGemini(text string) (string, error) {
+	err := godotenv.Load()
+	if err != nil {
+		fmt.Println("Error loading .env file")
+	}
+
 	ctx := context.Background()
 	apiKey := os.Getenv("GEMINI_API_KEY")
 
