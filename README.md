@@ -1,4 +1,4 @@
-# edubank-BE
+# edubank-backend
 
 A backend service built using Go, designed to generate smart questions for tests for university faculty based on uploaded notes, lectures, and other course material.
 
