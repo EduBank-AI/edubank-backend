@@ -45,9 +45,10 @@ func handleFileLoad(c *gin.Context) {
 	}
 
 	// Use your existing loadData function to process the file
-	go func() {
-		loadData(dst)
-	}()
+	if err := loadData(dst); err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
 
 	// Respond to the frontend
 	c.JSON(200, gin.H{
@@ -72,17 +73,23 @@ func handleAIRequest(c *gin.Context) {
 	c.JSON(200, gin.H{"answer": answer})
 }
 
-func loadData(file string) {
+func loadData(file string) error {
 	if strings.HasSuffix(strings.ToLower(file), ".pdf") {
 		fmt.Println("Starting PDF to text conversion...")
 		extractedOutput, err := Lib.PdfToText(file)
 
 		if err != nil {
 			fmt.Println("Error extracting pdf text: ", err)
+			return fmt.Errorf("pdf extraction failed: %v", err)
 		}
 
 		fmt.Println("Sending text to JSON formatter")
-		Lib.Format(extractedOutput, "")
+
+		lib_err := Lib.Format(extractedOutput, "")
+		if lib_err != nil {
+			fmt.Println("Error saving datat to jsonl: ", lib_err)
+			return fmt.Errorf("error in jsonl formatting: %v", lib_err)
+		}
 	} else if strings.HasSuffix(strings.ToLower(file), ".mp4") {
 		audioFile := "Assets/audio.wav"
 
@@ -91,21 +98,37 @@ func loadData(file string) {
 
 		if err != nil {
 			fmt.Println("Error extracting video text")
+			return fmt.Errorf("video transcription failed")
 		}
 
 		fmt.Println("Sending text to JSON formatter")
-		Lib.Format(nil, extractedOutput)
+
+		lib_err := Lib.Format(nil, extractedOutput)
+		if lib_err != nil {
+			fmt.Println("Error saving datat to jsonl: ", lib_err)
+			return fmt.Errorf("error in jsonl formatting: %v", lib_err)
+		}
 	} else if strings.HasSuffix(strings.ToLower(file), ".png") || strings.HasSuffix(strings.ToLower(file), ".jpeg") || strings.HasSuffix(strings.ToLower(file), ".jpg") {
 		fmt.Println("Starting image to text conversion...")
 		extractedOutput, err := Lib.ImgToText(os.Stdout, file)
 
 		if err != nil {
 			fmt.Println("Error extracting image text: ", err)
+			return fmt.Errorf("image ocr failed: %v", err)
 		}
 
 		fmt.Println("Sending text to JSON formatter")
-		Lib.Format(nil, extractedOutput)
+
+		lib_err := Lib.Format(nil, extractedOutput)
+		if lib_err != nil {
+			fmt.Println("Error saving datat to jsonl: ", lib_err)
+			return fmt.Errorf("error in jsonl formatting: %v", lib_err)
+		}
+
+	} else {
+		return fmt.Errorf("unsupported file type")
 	}
+	return nil
 }
 
 func ai(question string) {

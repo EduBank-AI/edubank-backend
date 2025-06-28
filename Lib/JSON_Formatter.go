@@ -2,6 +2,7 @@ package Lib
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -154,7 +155,7 @@ func saveImageAsJSONL(text string, filename string) error {
 	return nil
 }
 
-func Format(pages []PageData, imageText string) {
+func Format(pages []PageData, imageText string) error {
 	// If pages are provided, process PDF
 	if len(pages) > 0 {
 		filename := extractFilename(pages[0].Text)
@@ -162,9 +163,11 @@ func Format(pages []PageData, imageText string) {
 
 		if err != nil {
 			fmt.Println("Error saving file:", err)
-		} else {
-			fmt.Println("Data of ", filename+" added to dataset.jsonl")
+			return err
 		}
+
+		fmt.Println("Data of ", filename+" added to dataset.jsonl")
+		return nil
 	} else if imageText != "" {
 		// If image text is provided, process image
 		filename := extractFilename(imageText)
@@ -173,10 +176,12 @@ func Format(pages []PageData, imageText string) {
 
 		if err != nil {
 			fmt.Println("Error saving file:", err)
-		} else {
-			fmt.Println("Data of ", filename+" added to dataset.jsonl")
+			return err
 		}
-	} else {
-		fmt.Println("no valid input provided")
+		
+		fmt.Println("Data of ", filename+" added to dataset.jsonl")
+		return nil
 	}
+
+	return errors.New("no valid input provided")
 }
