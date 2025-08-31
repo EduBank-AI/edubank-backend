@@ -16,12 +16,21 @@ func setupRouter() *gin.Engine {
 	r := gin.Default()
 
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000"},
+		// AllowOrigins:     []string{"http://localhost:3000/", "https://127.0.0.1:3000"},
+		AllowAllOrigins:  true,
 		AllowMethods:     []string{"POST", "GET", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 	}))
+
+	// r.Use(cors.Default())
+
+	r.GET("/", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"message": "Server is running!",
+		})
+	})
 
 	r.POST("/load", handleFileLoad)
 	r.POST("/ai", handleAIRequest) // Add AI route
@@ -58,6 +67,8 @@ func handleFileLoad(c *gin.Context) {
 }
 
 func handleAIRequest(c *gin.Context) {
+	fmt.Println("Received AI request")
+
 	var request struct {
 		Question string `json:"question"`
 	}
@@ -152,7 +163,7 @@ func main() {
 
 	// Start the server
 	r := setupRouter()
-	port := ":5000" // Change this if needed
+	port := ":6000" // Change this if needed
 	fmt.Println("Server running on http://localhost" + port)
 	if err := r.Run(port); err != nil {
 		log.Fatal("Failed to start server: ", err)
