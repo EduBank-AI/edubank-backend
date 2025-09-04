@@ -1,0 +1,15 @@
+CREATE TABLE IF NOT EXISTS universities (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  code TEXT UNIQUE NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS users (
+  id SERIAL PRIMARY KEY,
+  email TEXT UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL,
+  university_id INT REFERENCES universities(id) ON DELETE SET NULL,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
