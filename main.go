@@ -89,7 +89,7 @@ func setupRouter() *gin.Engine {
 func getPort() string {
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "6000"
+		port = "8080"
 	}
 	return fmt.Sprintf(":%s", port)
 }
