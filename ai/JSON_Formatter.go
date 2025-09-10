@@ -48,11 +48,11 @@ func cleanText(text string) string {
 }
 
 // Save extracted PDF text in a structured JSON
-func savePDFAsJSON(pages []PageData, filename string) error {
+func savePDFAsJSON(pages []PageData, filename string, jsonFileName string) error {
 	var data []Data
-	jsonFileName := "ai/dataset.jsonl"
 
 	_, err := os.Stat(jsonFileName)
+	fmt.Println("JSON File Name: ", jsonFileName)
 	if os.IsNotExist(err) {
 		createdFile, err := os.Create(jsonFileName)
 		if err != nil {
@@ -85,7 +85,20 @@ func savePDFAsJSON(pages []PageData, filename string) error {
 		Content: pages,
 	}
 
-	data = append(data, newTopic)
+	// Check if topic already exists
+	found := false
+	for i, d := range data {
+		if d.Topic == filename {
+			data[i] = newTopic // replace existing
+			found = true
+			break
+		}
+	}
+	if !found {
+		data = append(data, newTopic)
+	}
+
+
 	updatedJSON, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
 		fmt.Println("Error marshalling JSON:", err)
@@ -102,11 +115,11 @@ func savePDFAsJSON(pages []PageData, filename string) error {
 }
 
 // Save extracted image text as JSONL (AI-friendly)
-func saveImageAsJSONL(text string, filename string) error {
+func saveImageAsJSONL(text string, filename string, jsonFileName string) error {
 	var data []Data
-	jsonFileName := "ai/dataset.jsonl"
 
 	_, err := os.Stat(jsonFileName)
+	fmt.Println("JSON File Name: ", jsonFileName)
 	if os.IsNotExist(err) {
 		createdFile, err := os.Create(jsonFileName)
 		if err != nil {
@@ -155,11 +168,11 @@ func saveImageAsJSONL(text string, filename string) error {
 	return nil
 }
 
-func Format(pages []PageData, imageText string) error {
+func Format(pages []PageData, imageText string, jsonFilename string) error {
 	// If pages are provided, process PDF
 	if len(pages) > 0 {
 		filename := extractFilename(pages[0].Text)
-		err := savePDFAsJSON(pages, filename)
+		err := savePDFAsJSON(pages, filename, jsonFilename)
 
 		if err != nil {
 			fmt.Println("Error saving file:", err)
@@ -172,7 +185,7 @@ func Format(pages []PageData, imageText string) error {
 		// If image text is provided, process image
 		filename := extractFilename(imageText)
 		cleanedText := cleanText(imageText)
-		err := saveImageAsJSONL(cleanedText, filename)
+		err := saveImageAsJSONL(cleanedText, filename, jsonFilename)
 
 		if err != nil {
 			fmt.Println("Error saving file:", err)

@@ -2,48 +2,24 @@ package handlers
 
 import (
 	"log"
-	"net/http"
 	"strings"
 
 	"github.com/edubank/ai"
-	"github.com/gin-gonic/gin"
 )
 
 // FileUploadHandler handles the /load POST request for file uploads
-func FileUploadHandler(c *gin.Context) {
-	// Receive the file
-	file, err := c.FormFile("file")
-	if err != nil {
-		log.Printf("Error retrieving file: %v", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": "No file uploaded"})
-		return
-	}
-
-	// Save file to Assets/
-	dst := "ai/Assets/" + file.Filename
-	if err := c.SaveUploadedFile(file, dst); err != nil {
-		log.Printf("Error saving uploaded file: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save file"})
-		return
-	}
-
-	log.Printf("File uploaded: %s", file.Filename)
-
+func FileUploadHandler(dst string, jsonDir string) error {
 	// Process the file
-	if err := processFile(dst); err != nil {
-		log.Printf("Error processing file %s: %v", file.Filename, err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
+	if err := processFile(dst, jsonDir); err != nil {
+		log.Printf("Error processing file %s: %v", dst, err)
+		return err
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message":  "File processing started",
-		"filename": file.Filename,
-	})
+	return nil
 }
 
 // processFile determines file type and calls AI library functions
-func processFile(file string) error {
+func processFile(file string, jsonFile string) error {
 	if strings.HasSuffix(strings.ToLower(file), ".pdf") {
 		log.Println("Starting PDF to text conversion...")
 		extractedOutput, err := ai.PdfToText(file)
@@ -52,7 +28,8 @@ func processFile(file string) error {
 		}
 
 		log.Println("Sending text to JSON formatter...")
-		if err := ai.Format(extractedOutput, ""); err != nil {
+		log.Println("Json File: ", jsonFile)
+		if err := ai.Format(extractedOutput, "", jsonFile); err != nil {
 			return err
 		}
 
@@ -65,7 +42,7 @@ func processFile(file string) error {
 		}
 
 		log.Println("Sending text to JSON formatter...")
-		if err := ai.Format(nil, extractedOutput); err != nil {
+		if err := ai.Format(nil, extractedOutput, jsonFile); err != nil {
 			return err
 		}
 
@@ -80,7 +57,7 @@ func processFile(file string) error {
 		}
 
 		log.Println("Sending text to JSON formatter...")
-		if err := ai.Format(nil, extractedOutput); err != nil {
+		if err := ai.Format(nil, extractedOutput, jsonFile); err != nil {
 			return err
 		}
 

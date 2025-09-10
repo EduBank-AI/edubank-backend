@@ -1,0 +1,23 @@
+[
+  {
+    "topic": "6.5_-_Average_Value_of_a_Function",
+    "content": [
+      {
+        "page": 1,
+        "content": "**6.5 - Average Value of a Function**\n\nSuppose we have a function f(x) and its graph. Let's get a formula to find the average of n values of f.\n\n```\n     a         Xi-1        Xi        b\n```\n\n```\nΔx = (b-a) / n\n```\n\n```\nxᵢ = a + i Δx\n```\n\nAverage value of f(x):\n\n```\n(f(x₁) + f(x₂) + ... + f(xₙ)) / n = (1/n) * Σᵢ=₁ⁿ f(xᵢ)\n```\n\n```\n(1/ (b-a)) * Σᵢ=₁ⁿ f(xᵢ) Δx\n```\n\nExact value of f(x):\n\n```\nlim (n→∞) [ (1/(b-a)) * Σᵢ=₁ⁿ f(xᵢ) Δx ]\n```\n"
+      },
+      {
+        "page": 2,
+        "content": "**Definition**\n\nIf $f$ is integrable on $[a, b]$, then its average value $f_{avg}$ on $[a, b]$ is\n\n$$f_{avg} = \\frac{1}{b-a} \\int_a^b f(x) \\, dx$$\n\n**Example:** Find the average value of the function $f(x) = \\frac{1}{x}$ on the interval $[1, 7]$.\n\n$$f_{avg} = \\frac{1}{7-1} \\int_1^7 \\frac{1}{x} \\, dx = \\frac{1}{6} \\int_1^7 \\frac{1}{x} \\, dx$$\n\n$$ = \\frac{1}{6} [\\ln|x|]_1^7 = \\frac{1}{6} [\\ln 7 - \\ln 1] = \\frac{\\ln 7}{6}$$\n\n**Mean Value Theorem for Integrals**\n\nIf $f$ is continuous on $[a, b]$, then there exists a number $c$ in $[a, b]$ such that\n\n$$f(c) = f_{avg} = \\frac{1}{b-a} \\int_a^b f(x) \\, dx$$\n\nor\n\n$$\\int_a^b f(x) \\, dx = f(c) \\cdot [b - a]$$\n"
+      },
+      {
+        "page": 3,
+        "content": "**Mean Value Theorem for Integrals - Geometric Interpretation**\n\n*   The geometric interpretation of the Mean Value Theorem for Integrals is that, for positive functions *f*, there is a number *c* such that the rectangle with base [*a*, *b*] and height *f(c)* has the same area as the region under the graph of *f* from *a* to *b*.\n\n```\ny = f(x)\nf(c) = f_avg\na         b             x\n```\n\n```\nf(c)\nb - a\n```\n\n**Example**\n\n*   Consider again *f(x) = 1/x* on the interval [1, 7]. Find *c* such that *f(c) = f_avg*.\n\n```\nf_avg = (1/6) * ∫[1 to 7] (1/x) dx\n      = (1/6) * [ln(x)] evaluated from 1 to 7\n      = (1/6) * (ln(7) - ln(1))\n      = (1/6) * ln(7)\n```\n\n```\nf(c) = 1/c = f_avg = (1/6)ln(7)\n```\n\n```\n=\u003e c = 6/ln(7)\n```\n"
+      },
+      {
+        "page": 4,
+        "content": "**Average Value of a Function**\n\nConsider the graph of $f(x)$ below and find the average value of $f$ on $[0, 11]$.\n\n[Graph of f(x)]\n\n*Formula for Average Value*\n\nThe average value of a function $f(x)$ on the interval $[a, b]$ is given by:\n\n$f_{avg} = \\frac{1}{b-a} \\int_a^b f(x) \\, dx$\n\n*Applying the Formula*\n\nIn this case, $a = 0$ and $b = 11$, so we have:\n\n$f_{avg} = \\frac{1}{11-0} \\int_0^{11} f(x) \\, dx$\n\n$f_{avg} = \\frac{1}{11} \\int_0^{11} f(x) \\, dx$\n\n*Calculating the Integral as Area*\n\nWe can evaluate the integral by finding the areas under the curve:\n\n$f_{avg} = \\frac{1}{11} [A_1 + A_2]$\n\nwhere $A_1$ is the area under the curve from $x=0$ to $x=6$ and $A_2$ is the area under the curve from $x=6$ to $x=11$.\n\n*Calculating $A_1$*\n\n$A_1$ consists of a rectangle and a triangle:\n\n$A_1 = (3 \\times 8) + (\\frac{1}{2} \\times 3 \\times 3) = 24 + \\frac{9}{2}$\n\n*Calculating $A_2$*\n\n$A_2$ (area of semi-circle) is given as:\n\n$A_2 = 8\\pi$\n\n*Finding $f_{avg}$*\n\n$f_{avg} = \\frac{1}{11}[24 + \\frac{9}{2} + 8\\pi]$\n\n$f_{avg} = \\frac{1}{11}[\\frac{48}{2} + \\frac{9}{2} + 8\\pi]$\n\n$f_{avg} = \\frac{1}{11}[\\frac{57}{2} + 8\\pi]$\n"
+      }
+    ]
+  }
+]

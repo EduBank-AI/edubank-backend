@@ -60,13 +60,27 @@ func setupRouter() *gin.Engine {
 	})
 
 	// Routes
-	r.POST("/signup", handlers.SignupHandler)
-	r.POST("/login", handlers.LoginHandler)
-	auth := r.Group("/", middleware.AuthMiddleware())
+
+	// Auth routes
+	auth := r.Group("/auth")
 	{
-		auth.POST("/load", handlers.FileUploadHandler)
-		auth.POST("/ai", handlers.AIHandler)
+		auth.POST("/signup", handlers.SignupHandler)
+		auth.POST("/login", handlers.LoginHandler)
 	}
+
+	// Protected routes
+	api := r.Group("/api", middleware.AuthMiddleware())
+	{
+		api.POST("/datasets/upload", handlers.UploadDatasetHandler)
+    	api.GET("/datasets", handlers.ListDatasetsHandler)
+		api.POST("/ai", handlers.AIHandler)
+	}
+
+	// auth := r.Group("/", middleware.AuthMiddleware())
+	// {
+	// 	auth.POST("/load", handlers.FileUploadHandler)
+	// 	auth.POST("/ai", handlers.AIHandler)
+	// }
 
 	return r
 }

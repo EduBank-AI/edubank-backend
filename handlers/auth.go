@@ -74,6 +74,7 @@ func SignupHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Signup successful",
 		"token":   tokenStr,
+		"email":   req.Email,
 	})
 }
 
@@ -109,5 +110,8 @@ func LoginHandler(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"token": tokenString})
+	c.JSON(http.StatusOK, gin.H{
+		"token": tokenString,
+		"email": req.Email,
+	})
 }
