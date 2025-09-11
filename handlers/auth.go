@@ -41,7 +41,7 @@ func SignupHandler(c *gin.Context) {
 		"SELECT id FROM universities WHERE code=$1",
 		req.AccessCode).Scan(&universityID)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error":"invalid access code"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error":"Invalid Access Code"})
 		return
 	}
 
@@ -49,7 +49,7 @@ func SignupHandler(c *gin.Context) {
 	hashBytes, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
 		log.Printf("bcrypt error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error":"server error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error":"Server Error"})
 		return
 	}
 
@@ -60,7 +60,7 @@ func SignupHandler(c *gin.Context) {
 	)
 	if err != nil {
 		log.Printf("insert user error: %v", err)
-		c.JSON(http.StatusConflict, gin.H{"error":"user already exists or db error"})
+		c.JSON(http.StatusConflict, gin.H{"error":"User already exists or DB error!"})
 		return
 	}
 
@@ -81,7 +81,7 @@ func SignupHandler(c *gin.Context) {
 func LoginHandler(c *gin.Context) {
 	var req LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error":"invalid input"})
+		c.JSON(http.StatusBadRequest, gin.H{"error":"Invalid Input"})
 		return
 	}
 
@@ -89,12 +89,12 @@ func LoginHandler(c *gin.Context) {
 	var hash string
 	err := db.Pool.QueryRow(ctx, "SELECT password_hash FROM users WHERE email=$1", req.Email).Scan(&hash)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error":"invalid credentials"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error":"Invalid Credentials"})
 		return
 	}
 
 	if bcrypt.CompareHashAndPassword([]byte(hash), []byte(req.Password)) != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error":"invalid credentials"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error":"Invalid Credentials"})
 		return
 	}
 
@@ -106,7 +106,7 @@ func LoginHandler(c *gin.Context) {
 
 	tokenString, err := token.SignedString(jwtSecret)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error":"token error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error":"Token Error"})
 		return
 	}
 
